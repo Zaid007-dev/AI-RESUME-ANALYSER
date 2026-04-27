@@ -1,0 +1,105 @@
+import streamlit as st
+import pdfplumber
+import docx
+import os
+from dotenv import load_dotenv
+import google.generativeai as genai
+from openai import OpenAI
+
+load_dotenv()
+
+st.set_page_config(page_title="Advanced AI Resume Analyzer", layout="wide")
+
+# -----------------------------
+# Extract Resume Text
+# -----------------------------
+def extract_pdf(file):
+    text = ""
+    with pdfplumber.open(file) as pdf:
+        for page in pdf.pages:
+            txt = page.extract_text()
+            if txt:
+                text += txt
+    return text
+
+def extract_docx(file):
+    doc = docx.Document(file)
+    return "\n".join([para.text for para in doc.paragraphs])
+
+# -----------------------------
+# Gemini Setup
+# -----------------------------
+def analyze_with_gemini(prompt):
+    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(prompt)
+    return response.text
+
+# -----------------------------
+# OpenAI Setup
+# -----------------------------
+def analyze_with_openai(prompt):
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role":"user","content":prompt}]
+    )
+
+    return response.choices[0].message.content
+
+# -----------------------------
+# UI
+# -----------------------------
+st.title("🚀 Advanced AI Resume Analyzer")
+
+option = st.selectbox(
+    "Choose AI Model",
+    ["Gemini", "OpenAI"]
+)
+
+uploaded_file = st.file_uploader("Upload Resume", type=["pdf", "docx"])
+job_desc = st.text_area("Paste Job Description")
+
+if uploaded_file:
+
+    if uploaded_file.type == "application/pdf":
+        resume_text = extract_pdf(uploaded_file)
+    else:
+        resume_text = extract_docx(uploaded_file)
+
+    st.subheader("Resume Preview")
+    st.write(resume_text[:3000])
+
+    if st.button("Analyze Resume"):
+
+        prompt = f"""
+        Analyze this resume professionally.
+
+        Resume:
+        {resume_text}
+
+        Job Description:
+        {job_desc}
+
+        Give output in this format:
+
+        1. ATS Score /100
+        2. Resume Summary
+        3. Missing Skills
+        4. Grammar Mistakes
+        5. Improvements Needed
+        6. Best Projects to Add
+        7. HR Feedback
+        8. 5 Interview Questions
+        """
+
+        with st.spinner("Analyzing..."):
+
+            if option == "Gemini":
+                result = analyze_with_gemini(prompt)
+            else:
+                result = analyze_with_openai(prompt)
+
+        st.subheader("📊 Analysis Result")
+        st.write(result)
