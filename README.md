@@ -1,3 +1,4 @@
+
 # 🤖 AI Resume Analyzer
 
 > 💼 *Smarter resumes. Better opportunities. AI-powered insights.*
@@ -127,7 +128,8 @@ streamlit run app.py
 
 ## 🖼️ Project Interface
 
-(Add your screenshots here)
+<img width="1919" height="1079" alt="Screenshot 2026-05-03 155818" src="https://github.com/user-attachments/assets/2fddbda9-715f-47a6-8b6a-c1bd16adde16" />
+
 
 ---
 
