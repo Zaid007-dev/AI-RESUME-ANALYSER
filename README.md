@@ -148,6 +148,12 @@ If you like this project:
 
 ---
 
+## 🤝 Contributing
+
+Contributions are always welcome! Please feel free to submit a Pull Request.🚀  
+
+---
+
 ## 📜 License
 
 This project is open-source and available under the **MIT License**.
